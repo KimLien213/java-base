@@ -1,4 +1,4 @@
-package com.base.infra.config;
+package com.base.infra.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,62 +53,82 @@ public class RSAKeyLoader {
     }
 
     private String getPrivateKeyContent() throws IOException {
-        // Try PEM string first
+        // Try PEM string first (inline trong application.yml)
         if (StringUtils.hasText(jwtConfig.getRsa().getPrivateKeyPem())) {
+            log.info("Loading private key from inline PEM string");
             return jwtConfig.getRsa().getPrivateKeyPem();
         }
 
-        // Try resource file
+        // Try resource file (file trong classpath)
         Resource privateKeyResource = jwtConfig.getRsa().getPrivateKey();
         if (privateKeyResource != null && privateKeyResource.exists()) {
+            log.info("Loading private key from file: {}", privateKeyResource.getFilename());
             return privateKeyResource.getContentAsString(StandardCharsets.UTF_8);
         }
 
-        throw new IllegalStateException("No private key configured. Set either jwt.rsa.private-key-pem or jwt.rsa.private-key");
+        throw new IllegalStateException(
+                "No private key configured. Set either jwt.rsa.private-key-pem or jwt.rsa.private-key");
     }
 
     private String getPublicKeyContent() throws IOException {
-        // Try PEM string first
+        // Try PEM string first (inline trong application.yml)
         if (StringUtils.hasText(jwtConfig.getRsa().getPublicKeyPem())) {
+            log.info("Loading public key from inline PEM string");
             return jwtConfig.getRsa().getPublicKeyPem();
         }
 
-        // Try resource file
+        // Try resource file (file trong classpath)
         Resource publicKeyResource = jwtConfig.getRsa().getPublicKey();
         if (publicKeyResource != null && publicKeyResource.exists()) {
+            log.info("Loading public key from file: {}", publicKeyResource.getFilename());
             return publicKeyResource.getContentAsString(StandardCharsets.UTF_8);
         }
 
-        throw new IllegalStateException("No public key configured. Set either jwt.rsa.public-key-pem or jwt.rsa.public-key");
+        throw new IllegalStateException(
+                "No public key configured. Set either jwt.rsa.public-key-pem or jwt.rsa.public-key");
     }
 
     private RSAPrivateKey parsePrivateKey(String privateKeyPem) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // Loại bỏ headers và whitespace
         String privateKeyContent = privateKeyPem
                 .replaceAll("\\n", "")
+                .replaceAll("\\r", "")
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replace("-----BEGIN RSA PRIVATE KEY-----", "")
                 .replace("-----END RSA PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
-        byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
+            log.error("Failed to parse private key: {}", e.getMessage());
+            throw new InvalidKeySpecException("Invalid private key format", e);
+        }
     }
 
     private RSAPublicKey parsePublicKey(String publicKeyPem) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // Loại bỏ headers và whitespace
         String publicKeyContent = publicKeyPem
                 .replaceAll("\\n", "")
+                .replaceAll("\\r", "")
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replace("-----BEGIN RSA PUBLIC KEY-----", "")
                 .replace("-----END RSA PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
 
-        byte[] keyBytes = Base64.getDecoder().decode(publicKeyContent);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(publicKeyContent);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+        } catch (Exception e) {
+            log.error("Failed to parse public key: {}", e.getMessage());
+            throw new InvalidKeySpecException("Invalid public key format", e);
+        }
     }
 }

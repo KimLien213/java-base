@@ -2,7 +2,7 @@ package com.base.app.auth.handler;
 
 import com.base.app.auth.command.LoginCommand;
 import com.base.app.auth.dto.LoginResponseDto;
-import com.base.infra.security.service.JwtService;
+import com.base.infra.config.security.service.JwtService;
 import com.base.app.user.dto.UserDto;
 import com.base.domain.user.domain.Account;
 import com.base.domain.user.domain.valueobjects.UserId;

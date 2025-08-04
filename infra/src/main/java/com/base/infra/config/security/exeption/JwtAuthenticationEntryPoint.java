@@ -1,4 +1,4 @@
-package com.base.infra.security.exeption;
+package com.base.infra.config.security.exeption;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

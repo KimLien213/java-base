@@ -46,7 +46,7 @@ public class AccountEntity extends BaseEntity implements UserDetails {
     @Column(name = "is_credentials_non_expired", nullable = false)
     private Boolean isCredentialsNonExpired = true;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_account_user"))
     private UserEntity user;
 
@@ -57,22 +57,23 @@ public class AccountEntity extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return isAccountNonExpired;
+        return isAccountNonExpired != null ? isAccountNonExpired : true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
+        return isAccountNonLocked != null ? isAccountNonLocked : true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return isCredentialsNonExpired;
+        return isCredentialsNonExpired != null ? isCredentialsNonExpired : true;
     }
 
     @Override
     public boolean isEnabled() {
-        return isEnabled && user.getIsActive();
+        return isEnabled != null && isEnabled &&
+                (user != null && user.getIsActive() != null ? user.getIsActive() : true);
     }
 
     @PreUpdate

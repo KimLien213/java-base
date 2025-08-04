@@ -1,4 +1,4 @@
-package com.base.infra.config;
+package com.base.infra.config.security;
 
 
 import lombok.Getter;

@@ -29,11 +29,14 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
+        log.warn("Validation failed: {}", errors);
+
         return ResponseEntity.badRequest()
                 .body(ApiResponse.<Map<String, String>>builder()
                         .success(false)
                         .message("Validation failed")
                         .data(errors)
+                        .timestamp(java.time.LocalDateTime.now())
                         .build());
     }
 
@@ -46,11 +49,14 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
+        log.warn("Bind exception: {}", errors);
+
         return ResponseEntity.badRequest()
                 .body(ApiResponse.<Map<String, String>>builder()
                         .success(false)
                         .message("Validation failed")
                         .data(errors)
+                        .timestamp(java.time.LocalDateTime.now())
                         .build());
     }
 
@@ -58,20 +64,54 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Illegal argument: {}", ex.getMessage());
         return ResponseEntity.badRequest()
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
         log.warn("Bad credentials: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Invalid username or password"));
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message("Invalid username or password")
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+        log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
+
+        if (ex.getMessage() != null) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.<Void>builder()
+                            .success(false)
+                            .message(ex.getMessage())
+                            .timestamp(java.time.LocalDateTime.now())
+                            .build());
+        }
+
+        // other error
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message("Internal server error occurred")
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Internal server error occurred"));
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message("Internal server error occurred")
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
     }
 }

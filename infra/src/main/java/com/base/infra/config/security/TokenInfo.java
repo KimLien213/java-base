@@ -1,4 +1,4 @@
-package com.base.infra.security;
+package com.base.infra.config.security;
 
 import java.util.Date;
 

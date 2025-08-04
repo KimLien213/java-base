@@ -1,8 +1,8 @@
-package com.base.infra.security.filter;
+package com.base.infra.config.security.filter;
 
 import com.base.domain.user.domain.Account;
 import com.base.domain.user.repository.AccountRepository;
-import com.base.infra.security.service.JwtService;
+import com.base.infra.config.security.service.JwtService;
 import com.base.infra.user.entity.AccountEntity;
 import com.base.infra.user.repository.JpaAccountRepository;
 import jakarta.servlet.FilterChain;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,13 +28,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth/") ||
-                path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-resources/") ||
-                path.startsWith("/webjars/") ||
+        String method = request.getMethod();
+
+        // Log để debug
+        System.out.println("Request path: " + path + ", method: " + method);
+
+        // Public endpoints - Don't need filter
+        boolean shouldSkip = path.equals("/") ||
+                path.equals("/error") ||
+                path.equals("/favicon.ico") ||
+
+                // Auth endpoints
+                path.startsWith("/api/auth/") ||
+
+                // Test endpoints
+                path.startsWith("/api/test/") ||
+
+                // H2 Console
                 path.startsWith("/h2-console/") ||
-                path.equals("/swagger-ui.html");
+
+                // Swagger UI - Tất cả các path có thể
+                path.startsWith("/swagger-ui") ||
+                path.equals("/swagger-ui.html") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars/") ||
+                path.startsWith("/configuration/") ||
+                path.equals("/swagger-config") ||
+                path.startsWith("/api-docs");
+
+        if (shouldSkip) {
+            System.out.println("Skipping filter for path: " + path);
+        }
+
+        return shouldSkip;
     }
 
     @Override

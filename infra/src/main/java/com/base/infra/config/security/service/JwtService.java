@@ -1,11 +1,12 @@
-package com.base.infra.security.service;
+package com.base.infra.config.security.service;
 
 import com.base.domain.user.domain.Account;
-import com.base.infra.config.JwtConfig;
-import com.base.infra.security.TokenInfo;
+import com.base.infra.config.security.JwtConfig;
+import com.base.infra.config.security.TokenInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,9 +56,11 @@ public class JwtService {
             return Jwts.builder()
                     .setClaims(claims)
                     .setSubject(account.getUsername())
+                    .setIssuer(jwtConfig.getIssuer())
+                    .setAudience(jwtConfig.getAudience())
                     .setIssuedAt(Date.from(now))
                     .setExpiration(Date.from(expirationTime))
-                    .signWith(privateKey)
+                    .signWith(privateKey, SignatureAlgorithm.RS256) // Sử dụng RS256 cho RSA
                     .compact();
         } catch (Exception e) {
             log.error("Error generating JWT token", e);
@@ -125,8 +128,6 @@ public class JwtService {
         }
     }
 
-
-    // Validation methods
     public boolean validateToken(String token, Account account) {
         try {
             return isTokenValid(token, account);
@@ -158,7 +159,6 @@ public class JwtService {
         return jwtConfig.getAudience();
     }
 
-    // Token info extraction
     public TokenInfo extractTokenInfo(String token) {
         try {
             Claims claims = extractAllClaims(token);

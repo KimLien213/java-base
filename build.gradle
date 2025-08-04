@@ -1,8 +1,7 @@
-// Root build.gradle
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.4' apply false
-    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6' apply false
 }
 
 group = 'com.base'
@@ -41,7 +40,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.4'
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:3.3.5'  // Use stable version
             mavenBom 'org.testcontainers:testcontainers-bom:1.19.3'
         }
     }

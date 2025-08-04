@@ -3,10 +3,18 @@ package com.base.infra.user.mapper;
 import com.base.domain.user.domain.Account;
 import com.base.domain.user.domain.Role;
 import com.base.infra.user.entity.AccountEntity;
+import com.base.infra.user.entity.UserEntity;
+import com.base.infra.user.repository.JpaUserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class AccountMapper {
+
+    private final JpaUserRepository userRepository;
 
     public AccountEntity toEntity(Account domain) {
         if (domain == null) return null;
@@ -20,6 +28,16 @@ public class AccountMapper {
         entity.setIsAccountNonExpired(domain.getIsAccountNonExpired());
         entity.setIsAccountNonLocked(domain.getIsAccountNonLocked());
         entity.setIsCredentialsNonExpired(domain.getIsCredentialsNonExpired());
+
+        // Set required User relationship
+        if (domain.getUserId() != null) {
+            UserEntity userEntity = userRepository.findById(domain.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + domain.getUserId()));
+            entity.setUser(userEntity);
+            log.debug("Set user relationship for account: {} -> user: {}", domain.getId(), domain.getUserId());
+        } else {
+            throw new IllegalArgumentException("Account must have a userId");
+        }
 
         return entity;
     }
@@ -36,7 +54,13 @@ public class AccountMapper {
         domain.setIsAccountNonExpired(entity.getIsAccountNonExpired());
         domain.setIsAccountNonLocked(entity.getIsAccountNonLocked());
         domain.setIsCredentialsNonExpired(entity.getIsCredentialsNonExpired());
-        domain.setUserId(entity.getUser().getId());
+
+        // Get userId from required User relationship
+        if (entity.getUser() != null) {
+            domain.setUserId(entity.getUser().getId());
+        } else {
+            throw new IllegalStateException("AccountEntity must have a User relationship");
+        }
 
         return domain;
     }
