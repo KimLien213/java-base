@@ -7,11 +7,12 @@ import com.base.app.user.command.CreateUserCommand;
 import com.base.app.user.dto.UserDto;
 import com.base.app.user.handler.CreateUserHandler;
 import com.base.interfaces.auth.request.LoginRequest;
-import com.base.interfaces.shared.response.ApiResponse;
+import com.base.interfaces.shared.response.CommonResponse;
 import com.base.interfaces.user.request.CreateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,11 +36,11 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Register new user", description = "Register a new user account")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User created successfully",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input data")
+            @ApiResponse(responseCode = "201", description = "User created successfully",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<ApiResponse<UserDto>> register(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<CommonResponse<UserDto>> register(@Valid @RequestBody CreateUserRequest request) {
         try {
             CreateUserCommand command = CreateUserCommand.of(
                     request.email(),
@@ -52,28 +53,28 @@ public class AuthController {
             UserDto userDto = createUserHandler.handle(command);
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("User created successfully", userDto));
+                    .body(CommonResponse.success("User created successfully", userDto));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Registration failed: " + e.getMessage()));
+                    .body(CommonResponse.error("Registration failed: " + e.getMessage()));
         }
     }
 
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticate user and return JWT token")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Login successful",
+            @ApiResponse(responseCode = "200", description = "Login successful",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Invalid credentials")
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
-    public ResponseEntity<ApiResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<CommonResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequest request) {
         try {
             LoginCommand command = new LoginCommand(request.username(), request.password());
             LoginResponseDto response = loginHandler.handle(command);
-            return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+            return ResponseEntity.ok(CommonResponse.success("Login successful", response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Login failed: " + e.getMessage()));
+                    .body(CommonResponse.error("Login failed: " + e.getMessage()));
         }
     }
 }

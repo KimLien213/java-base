@@ -1,6 +1,6 @@
 package com.base.interfaces.shared.advice;
 
-import com.base.interfaces.shared.response.ApiResponse;
+import com.base.interfaces.shared.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
+    public ResponseEntity<CommonResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new HashMap<>();
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         log.warn("Validation failed: {}", errors);
 
         return ResponseEntity.badRequest()
-                .body(ApiResponse.<Map<String, String>>builder()
+                .body(CommonResponse.<Map<String, String>>builder()
                         .success(false)
                         .message("Validation failed")
                         .data(errors)
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleBindException(BindException ex) {
+    public ResponseEntity<CommonResponse<Map<String, String>>> handleBindException(BindException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         log.warn("Bind exception: {}", errors);
 
         return ResponseEntity.badRequest()
-                .body(ApiResponse.<Map<String, String>>builder()
+                .body(CommonResponse.<Map<String, String>>builder()
                         .success(false)
                         .message("Validation failed")
                         .data(errors)
@@ -61,10 +61,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<CommonResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn("Illegal argument: {}", ex.getMessage());
         return ResponseEntity.badRequest()
-                .body(ApiResponse.<Void>builder()
+                .body(CommonResponse.<Void>builder()
                         .success(false)
                         .message(ex.getMessage())
                         .timestamp(java.time.LocalDateTime.now())
@@ -72,10 +72,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
+    public ResponseEntity<CommonResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
         log.warn("Bad credentials: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.<Void>builder()
+                .body(CommonResponse.<Void>builder()
                         .success(false)
                         .message("Invalid username or password")
                         .timestamp(java.time.LocalDateTime.now())
@@ -83,12 +83,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+    public ResponseEntity<CommonResponse<Void>> handleRuntimeException(RuntimeException ex) {
         log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
 
         if (ex.getMessage() != null) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.<Void>builder()
+                    .body(CommonResponse.<Void>builder()
                             .success(false)
                             .message(ex.getMessage())
                             .timestamp(java.time.LocalDateTime.now())
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
 
         // other error
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.<Void>builder()
+                .body(CommonResponse.<Void>builder()
                         .success(false)
                         .message("Internal server error occurred")
                         .timestamp(java.time.LocalDateTime.now())
@@ -105,10 +105,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
+    public ResponseEntity<CommonResponse<Void>> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.<Void>builder()
+                .body(CommonResponse.<Void>builder()
                         .success(false)
                         .message("Internal server error occurred")
                         .timestamp(java.time.LocalDateTime.now())

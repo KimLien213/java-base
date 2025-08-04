@@ -6,7 +6,7 @@ import com.base.app.user.handler.ChangePasswordHandler;
 import com.base.domain.user.domain.valueobjects.UserId;
 import com.base.domain.user.repository.UserRepository;
 import com.base.infra.user.entity.AccountEntity;
-import com.base.interfaces.shared.response.ApiResponse;
+import com.base.interfaces.shared.response.CommonResponse;
 import com.base.interfaces.user.request.ChangePasswordRequest;
 import com.base.interfaces.user.request.UpdateProfileRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("/me")
     @Operation(summary = "Get current user", description = "Get current authenticated user information")
-    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<CommonResponse<UserDto>> getCurrentUser(Authentication authentication) {
         AccountEntity accountEntity = (AccountEntity) authentication.getPrincipal();
 
         var user = userRepository.findById(UserId.of(accountEntity.getUser().getId()))
@@ -39,12 +39,12 @@ public class UserController {
 
         UserDto userDto = UserDto.fromDomain(user);
 
-        return ResponseEntity.ok(ApiResponse.success(userDto));
+        return ResponseEntity.ok(CommonResponse.success(userDto));
     }
 
     @PutMapping("/me/profile")
     @Operation(summary = "Update profile", description = "Update current user profile information")
-    public ResponseEntity<ApiResponse<UserDto>> updateProfile(
+    public ResponseEntity<CommonResponse<UserDto>> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request,
             Authentication authentication) {
 
@@ -53,12 +53,12 @@ public class UserController {
 
         UserDto userDto = updateUserProfileHandler.handle(request.toCommand(userId));
 
-        return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", userDto));
+        return ResponseEntity.ok(CommonResponse.success("Profile updated successfully", userDto));
     }
 
     @PutMapping("/me/password")
     @Operation(summary = "Change password", description = "Change current user password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(
+    public ResponseEntity<CommonResponse<Void>> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             Authentication authentication) {
 
@@ -66,6 +66,6 @@ public class UserController {
 
         changePasswordHandler.handle(request.toCommand(accountEntity.getUsername()));
 
-        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+        return ResponseEntity.ok(CommonResponse.success("Password changed successfully", null));
     }
 }
