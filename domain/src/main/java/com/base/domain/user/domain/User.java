@@ -12,21 +12,18 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User extends BaseDomain {
 
-    private String email;
+    private Email email;
     private String firstName;
     private String lastName;
     private Boolean isActive = true;
 
     public static User create(Email email, String firstName, String lastName) {
         User user = new User();
-        user.setEmail(email.value());
+        user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setIsActive(true);
         return user;
-    }
-    public Email getEmail() {
-        return Email.of(email);
     }
 
     public void deactivate() {
@@ -46,19 +43,4 @@ public class User extends BaseDomain {
         this.lastName = lastName;
     }
 
-    public void changeEmail(Email newEmail) {
-        this.email = newEmail.value();
-    }
-
-
-    // Business rules
-    public boolean canUpdateProfile() {
-        return isActive;
-    }
-
-    public boolean hasValidProfile() {
-        return firstName != null && !firstName.trim().isEmpty() &&
-                lastName != null && !lastName.trim().isEmpty() &&
-                email != null && !email.trim().isEmpty();
-    }
 }

@@ -1,7 +1,7 @@
-package com.base.app.user.handler;
+package com.base.app.auth.handler;
 
-import com.base.app.user.command.CreateUserCommand;
-import com.base.app.user.dto.UserDto;
+import com.base.app.auth.command.CreateUserCommand;
+import com.base.app.auth.dto.UserDto;
 import com.base.domain.user.domain.Account;
 import com.base.domain.user.domain.User;
 import com.base.domain.user.domain.valueobjects.Email;

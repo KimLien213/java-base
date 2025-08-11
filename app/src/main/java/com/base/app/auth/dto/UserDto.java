@@ -1,4 +1,4 @@
-package com.base.app.user.dto;
+package com.base.app.auth.dto;
 
 import com.base.domain.user.domain.User;
 import com.fasterxml.jackson.annotation.JsonFormat;

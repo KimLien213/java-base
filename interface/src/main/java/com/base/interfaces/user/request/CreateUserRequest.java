@@ -1,6 +1,6 @@
 package com.base.interfaces.user.request;
 
-import com.base.app.user.command.CreateUserCommand;
+import com.base.app.auth.command.CreateUserCommand;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

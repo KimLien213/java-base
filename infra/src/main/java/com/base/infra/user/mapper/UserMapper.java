@@ -1,6 +1,7 @@
 package com.base.infra.user.mapper;
 
 import com.base.domain.user.domain.User;
+import com.base.domain.user.domain.valueobjects.Email;
 import com.base.infra.user.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class UserMapper {
 
         User domain = new User();
         domain.setId(entity.getId());
-        domain.setEmail(entity.getEmail());
+        domain.setEmail(Email.of(entity.getEmail()));
         domain.setFirstName(entity.getFirstName());
         domain.setLastName(entity.getLastName());
         domain.setIsActive(entity.getIsActive());

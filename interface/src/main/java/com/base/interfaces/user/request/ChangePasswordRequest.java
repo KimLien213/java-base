@@ -1,6 +1,6 @@
 package com.base.interfaces.user.request;
 
-import com.base.app.user.command.ChangePasswordCommand;
+import com.base.app.auth.command.ChangePasswordCommand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

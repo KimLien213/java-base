@@ -1,8 +1,8 @@
 package com.base.interfaces.user;
 
-import com.base.app.user.handler.UpdateUserProfileHandler;
-import com.base.app.user.dto.UserDto;
-import com.base.app.user.handler.ChangePasswordHandler;
+import com.base.app.auth.handler.UpdateUserProfileHandler;
+import com.base.app.auth.dto.UserDto;
+import com.base.app.auth.handler.ChangePasswordHandler;
 import com.base.domain.user.domain.valueobjects.UserId;
 import com.base.domain.user.repository.UserRepository;
 import com.base.infra.user.entity.AccountEntity;

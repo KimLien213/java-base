@@ -1,4 +1,4 @@
-package com.base.app.user.command;
+package com.base.app.auth.command;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

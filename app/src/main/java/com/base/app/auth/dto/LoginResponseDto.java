@@ -1,7 +1,6 @@
 package com.base.app.auth.dto;
 
 
-import com.base.app.user.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;

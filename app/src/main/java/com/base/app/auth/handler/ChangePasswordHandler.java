@@ -1,7 +1,7 @@
-package com.base.app.user.handler;
+package com.base.app.auth.handler;
 
 
-import com.base.app.user.command.ChangePasswordCommand;
+import com.base.app.auth.command.ChangePasswordCommand;
 import com.base.domain.user.domain.Account;
 import com.base.domain.user.domain.valueobjects.Password;
 import com.base.domain.user.repository.AccountRepository;

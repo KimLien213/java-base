@@ -1,7 +1,7 @@
-package com.base.app.user.handler;
+package com.base.app.auth.handler;
 
-import com.base.app.user.command.UpdateUserProfileCommand;
-import com.base.app.user.dto.UserDto;
+import com.base.app.auth.command.UpdateUserProfileCommand;
+import com.base.app.auth.dto.UserDto;
 import com.base.domain.user.domain.User;
 import com.base.domain.user.domain.valueobjects.UserId;
 import com.base.domain.user.repository.UserRepository;
@@ -20,10 +20,6 @@ public class UpdateUserProfileHandler {
         UserId userId = UserId.of(command.userId());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + command.userId()));
-
-        if (!user.canUpdateProfile()) {
-            throw new IllegalStateException("User profile cannot be updated");
-        }
 
         user.updateProfile(command.firstName(), command.lastName());
         user = userRepository.save(user);
